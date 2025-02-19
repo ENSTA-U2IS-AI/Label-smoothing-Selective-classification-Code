@@ -47,6 +47,18 @@ We include:
 - Cityscapes with DeepLabV3+ (ResNet-101 backbone)
 - IMDB with an LSTM-based model
 
+### Citation
+
+If you find this work helpful for your research, consider citing:
+```
+@inproceedings{xia2024understanding,
+    title={Towards Understanding Why Label Smoothing Degrades Selective Classification and How to Fix It},
+    author={Xia, Guoxuan and Laurent, Olivier and Franchi, Gianni and Bouganis, Christos-Savvas},
+    booktitle={ICLR},
+    year={2025}       
+}
+```
+
 You will find 3 other notebooks directly in the `experiments` folder:
 - Bank Marteking with multilayer perceptron in `experiments/tabular`
 - Online Shoppers with multilayer perceptron in `experiments/tabular`

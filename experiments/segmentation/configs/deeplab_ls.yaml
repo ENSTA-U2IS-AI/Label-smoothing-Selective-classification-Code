@@ -1,0 +1,50 @@
+# lightning.pytorch==2.2.0
+eval_after_fit: true
+seed_everything: false
+trainer:
+  accelerator: gpu
+  devices: 2
+  precision: 16-mixed
+  max_steps: 30000
+  check_val_every_n_epoch: 5
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs
+      name: deeplab_ls
+      default_hp_metric: false
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val/seg/mIoU
+      mode: max
+      save_last: true
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+model:
+  num_classes: 19
+  loss:
+    class_path: torch.nn.CrossEntropyLoss
+    init_args:
+      label_smoothing: 0.2
+  version: std
+  arch: 101
+  style: v3+
+  output_stride: 16
+  separable: false
+  log_plots: true
+data:
+  root: ./data/Cityscapes
+  batch_size: 8
+  crop_size: 512
+  eval_size:
+  - 1024
+  - 2048
+  num_workers: 12
+optimizer:
+  lr: 1e-2
+  weight_decay: 1e-4
+  momentum: 0.9
+lr_scheduler:
+  total_iters: 161

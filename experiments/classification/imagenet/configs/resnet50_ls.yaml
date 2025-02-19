@@ -1,0 +1,53 @@
+# lightning.pytorch==2.2.0.post0
+seed_everything: false
+eval_after_fit: true
+trainer:
+  accelerator: gpu
+  devices: 4
+  precision: 16-mixed
+  max_epochs: 120
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/
+      name: resnet50_ls
+      default_hp_metric: false
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val/cls/Acc
+      mode: max
+      save_last: true
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: val/cls/Acc
+      patience: 1000
+      check_finite: true
+model:
+  num_classes: 1000
+  in_channels: 3
+  loss:
+    class_path: torch.nn.CrossEntropyLoss
+    init_args:
+      label_smoothing: 0.2
+  version: std
+  arch: 50
+  style: imagenet
+  log_plots: true
+data:
+  root: ./data/imagenet1k
+  batch_size: 256
+  interpolation: bicubic
+  num_workers: 14
+optimizer:
+  lr: 0.4
+  momentum: 0.9
+  weight_decay: 1e-4
+lr_scheduler:
+  warmup_start_factor: 1e-4
+  warmup_epochs: 5
+  max_epochs: 120
+  

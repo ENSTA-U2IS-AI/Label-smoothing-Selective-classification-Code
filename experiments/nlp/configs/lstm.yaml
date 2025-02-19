@@ -1,0 +1,44 @@
+# lightning.pytorch==2.2.0.post0
+seed_everything: false
+eval_after_fit: true
+trainer:
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
+  max_epochs: 10
+  check_val_every_n_epoch: 5
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/
+      name: lstm
+      default_hp_metric: false
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val/cls/Acc
+      mode: max
+      save_last: true
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: val/cls/Acc
+      patience: 1000
+      check_finite: true
+model:
+  model:
+    class_path: torch_uncertainty_ls.LSTMNet
+  num_classes: 1
+  loss:
+    class_path: torch.nn.BCEWithLogitsLoss
+  log_plots: true
+data:
+  root: ./data
+  batch_size: 64
+  val_split: 0.0
+  max_seq_len: 256
+  num_workers: 12
+optimizer:
+  lr: 0.001

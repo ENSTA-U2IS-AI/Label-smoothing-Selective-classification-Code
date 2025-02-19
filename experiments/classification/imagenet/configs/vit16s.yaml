@@ -1,0 +1,57 @@
+# lightning.pytorch==2.2.0.post0
+seed_everything: false
+eval_after_fit: true
+trainer:
+  accelerator: gpu
+  devices: 4
+  precision: 32
+  max_epochs: 300
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/
+      name: vit16s
+      default_hp_metric: false
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val/cls/Acc
+      mode: max
+      save_last: true
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    init_args:
+      logging_interval: step
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: val/cls/Acc
+      patience: 1000
+      check_finite: true
+model:
+  model:
+    class_path: timm.models.vit_small_patch16_224
+    init_args:
+      pretrained: false
+    dict_kwargs:
+      drop_rate: 0.1
+  num_classes: 1000
+  loss: torch.nn.CrossEntropyLoss
+  log_plots: true
+  sam_gradient_clip_val: 1.0
+data:
+  root: ./data/imagenet1k
+  batch_size: 512
+  interpolation: bicubic
+  num_workers: 7
+optimizer:
+  base_optimizer: torch.optim.AdamW
+  rho: 0.2
+  optimizer_kwargs:
+    lr: 3e-3
+    weight_decay: 0.3
+    betas:
+      - 0.9
+      - 0.999
+lr_scheduler:
+  warmup_start_factor: 1e-4
+  warmup_epochs: 15
+  max_epochs: 300
